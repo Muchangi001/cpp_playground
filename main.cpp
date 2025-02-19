@@ -2,42 +2,60 @@
 #include <cstring>
 #include <memory>
 
-class String{
+class String
+{
     private:
     char *buffer;
     unsigned int size;
 
     public:
-    String(const char *string) {
+    String(const char *string)
+    {
         size = std::strlen(string);
-        buffer = new char[size+1];
+        buffer = new char[size + 1];
         memcpy(buffer, string, size);
-        buffer[size] = 0;
+        buffer[size] = 0; // ensure the null terminating character is included
     }
 
-    String(const String &other) = delete; // remove the default copy constructor
+    // overload the copy constructor to perform deep copy
+    String(const String &other)
+        : size(other.size)
+    {
+        buffer = new char[size + 1];
+        memcpy(buffer, other.buffer, size + 1);
+    }
 
-    ~String() {
+    ~String()
+    {
         delete[] buffer;
     }
 
-    char& operator[](unsigned int index) {
+    // overload the [] operator
+    char& operator[](unsigned int index)
+    {
         if (index > size) {
             return buffer[size];
         }
         return buffer[index];
     }
-    friend std::ostream& operator<<(std::ostream& stream, const String &string);
+
+    // overload the << operator
+    friend std::ostream& operator<<(const std::ostream& stream, const String &string);
 };
 
-// overloading the << operator
-std::ostream& operator<<(std::ostream& stream, const String &string) {
+// define the << operator overloading
+std::ostream& operator<<(const std::ostream& stream, const String &string)
+{
     stream << string.buffer;
     return stream;
 }
 
-int main() {
-    String string = "Hello";
-    std::cout << string << std::endl;
+int main()
+{
+    String string1 = "Hello";
+    String string2 = string1; // performing deep copy
+    string2[1] = 'a';
+    std::cout << string1 << std::endl;
+    std::cout << string2 << std::endl;
     return 0;
 }
